@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping, MutableMapping, Sequence
 from dataclasses import dataclass
-from typing import Mapping, MutableMapping, Optional, Sequence, Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 from scipy.stats import norm
 
-from risksim.utils import var_covar_matrix, cholesky_decomp
+from risksim.utils import cholesky_decomp, var_covar_matrix
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +27,8 @@ class CopulaConfig:
     """
 
     n_runs: int
-    x_range: Tuple[float, float]
-    y_range: Tuple[float, float]
+    x_range: tuple[float, float]
+    y_range: tuple[float, float]
     mu: Sequence[float]
     std: Sequence[float]
     corr: Sequence[float]
@@ -44,7 +45,7 @@ class CopulaSimulator:
     def __init__(
             self,
             config: CopulaConfig,
-            rng: Optional[np.random.Generator] = None
+            rng: np.random.Generator | None = None
     ):
         self.config = config
         self.rng = rng or np.random.default_rng()

@@ -1,11 +1,10 @@
 from dataclasses import dataclass
-from typing import Optional
 
 import numpy as np
 import pandas as pd
 
-from risksim.risk import RiskMeasure
 from risksim.copula import CopulaConfig, CopulaSimulator
+from risksim.risk import RiskMeasure
 
 
 @dataclass
@@ -25,8 +24,8 @@ class RiskExperiment:
     def __init__(
             self,
             copula_config: CopulaConfig,
-            experiment_config: Optional[RiskExperimentConfig] = None,
-            rng: Optional[np.random.Generator] = None
+            experiment_config: RiskExperimentConfig | None = None,
+            rng: np.random.Generator | None = None
     ):
         self.copula_config = copula_config
         self.ex_config = experiment_config or RiskExperimentConfig()

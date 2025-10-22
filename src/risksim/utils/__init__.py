@@ -1,6 +1,6 @@
-from .utils import var_covar_matrix, cholesky_decomp
+from .utils import cholesky_decomp, var_covar_matrix
 
 __all__ = [
-    'var_covar_matrix',
-    'cholesky_decomp'
+    'cholesky_decomp',
+    'var_covar_matrix'
 ]

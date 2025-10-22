@@ -1,6 +1,6 @@
-from .copula import CopulaSimulator, CopulaConfig
+from .copula import CopulaConfig, CopulaSimulator
 
 __all__ = [
-    'CopulaSimulator',
-    'CopulaConfig'
+    'CopulaConfig',
+    'CopulaSimulator'
 ]
