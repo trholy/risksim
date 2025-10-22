@@ -1,6 +1,8 @@
 build/
 old/
 
+project_structure.py
+
 .env
 .env.local
 /.idea
