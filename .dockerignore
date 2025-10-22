@@ -1,0 +1,15 @@
+datasets/
+build/
+
+.env
+.env.local
+/.idea
+__pycache__/
+.DS_Store
+*.egg*
+
+*.xml
+*.pyc
+*.log
+.coverage
+.pytest_cache/
