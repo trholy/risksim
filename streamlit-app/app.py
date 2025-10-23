@@ -8,9 +8,9 @@ from risksim.experiment import RiskExperiment, RiskExperimentConfig
 from risksim.utils import StockDataLoader, PortfolioAnalyzer
 from risksim.risk import RiskMeasure
 
-st.set_page_config(page_title="Gaussian Copula Simulator", layout="wide")
+st.set_page_config(page_title="RiskSim", layout="wide")
 
-st.title("📊 Gaussian Copula Simulation & Portfolio Risk Experiment")
+st.title("📈 RiskSim – Comprehensive Risk Simulation Framework")
 
 st.sidebar.header("Simulation Parameters")
 
