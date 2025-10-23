@@ -1,90 +1,143 @@
-# 📈 RiskSim – Monte Carlo Risk Simulation using Gaussian Copulas
+# 📈 RiskSim – Comprehensive Risk Simulation Framework
 
-**RiskSim** is a Python-based simulation and analytics framework for **Monte Carlo–based risk analysis** using **Gaussian copulas**.
-It allows users to model **portfolio dependencies**, estimate **risk measures** (VaR, CVaR, power spectral risk measure), and explore **simulation instability** interactively via a **Streamlit web application**.
+### Monte Carlo, Historical, and Variance–Covariance Methods for Portfolio Risk Analysis
+
+**RiskSim** is a Python-based risk analytics framework for **quantitative portfolio risk estimation**.
+It supports three major methodologies — **Monte Carlo Simulation (Gaussian Copula)**, **Historical Simulation**, and the **Variance–Covariance Method** — within a unified and interactive environment.
+
+The framework enables users to model **portfolio dependencies**, compute **risk measures** such as **Value-at-Risk (VaR)**, **Conditional VaR (CVaR)**, and the **Power Spectral Risk Measure (PSRM)**, and analyze **simulation stability** via a modern **Streamlit web interface**.
 
 ---
 
 ## 🚀 Features
 
-* **Gaussian Copula Simulation** – Model dependent random variables with correlated structures using the Gaussian copula framework.
+* 🧠 **Three Integrated Risk Methods**
 
-* **Monte Carlo Engine** – Generate pseudo-random realizations of portfolio components and analyze their joint distributions.
+  * **Monte Carlo Simulation (Gaussian Copula)** – Generate correlated synthetic returns using the Gaussian copula framework.
+  * **Historical Simulation** – Estimate risk directly from empirical portfolio return data.
+  * **Variance–Covariance Method** – Compute risk measures under the normality assumption using μ–σ parameterization.
 
-* **Flexible Parameterization** – Define means, standard deviations, and correlations interactively in the Streamlit UI.
+* 📊 **Risk Measure Computation** – Compute **VaR**, **CVaR**, and **PSRM** across all methods.
 
-* **Interactive Dashboard** – Visualize simulated distributions, copula realizations, and portfolio outcomes directly in the browser.
+* 💻 **Interactive Dashboard** – Explore dependencies, distributions, and risk measure variability directly in your browser using Streamlit.
 
-* **Risk Measure Estimation** – Compute Value-at-Risk (VaR), Conditional VaR (CVaR), and Power Spectral Risk Measure for simulated portfolios.
+* 🔁 **Instability & Convergence Analysis** – Evaluate the variability of Monte Carlo results under repeated sampling.
 
-* **Experiment Mode** – Run multiple simulation batches to analyze **instability** and **variance** of Monte Carlo results under repeated sampling.
+---
+
+## 🧩 Methodological Overview
+
+RiskSim provides three approaches to estimate portfolio risk.
+
+### 1. **Monte Carlo Simulation (Gaussian Copula)**
+
+The Monte Carlo engine generates **pseudo-random correlated realizations** of portfolio components using a **Gaussian copula**.
+It allows flexible specification of marginal distributions and dependency structures via Cholesky decomposition of the covariance matrix.
+
+**Process Overview:**
+
+1. Generate independent uniform random samples.
+2. Transform to standard normal variates.
+3. Introduce correlation using the covariance matrix.
+4. Convert to correlated uniform variables via the Gaussian copula.
+5. Apply user-defined marginals to obtain dependent portfolio returns.
+
+This approach provides high flexibility for **dependency modeling** and **portfolio stress testing**.
+
+---
+
+### 2. **Historical Simulation**
+
+The historical simulation approach uses **observed empirical portfolio returns** instead of simulated data.
+Each asset’s historical returns are combined to form portfolio returns and used directly to calculate VaR, CVaR, and PSRM **without any distributional assumptions**. 
+This method reflects **real-world market behavior**, capturing skewness, kurtosis, and tail effects inherent in empirical data.
+
+---
+
+### 3. **Variance–Covariance (Parametric) Method**
+
+This analytical method assumes **normally distributed returns**, parameterized by **mean (μ)** and **standard deviation (σ)**.
+A **variance–covariance matrix** models interdependencies between assets.
+
+**Computation:**
+
+* Portfolio variance is derived analytically from the covariance matrix.
+* Portfolio losses are computed under normality assumptions.
+* VaR, CVaR, and PSRM are evaluated using the parameterized results.
 
 ---
 
 ## 🧮 High-Level Process
 
-### 1. **Variable Specification**
+1. **Variable Specification** – Define simulation parameters (means, standard deviations, correlations, sample sizes).
+2. **Covariance & Cholesky Decomposition** – Construct correlation structures for dependent random variables.
+3. **Portfolio Return Generation** – Depending on the chosen method, generate simulated, empirical, or analytical portfolio return data.
+4. **Risk Measure Estimation** – Calculate VaR, CVaR, and PSRM consistently across all methods.
+5. **Visualization & Analysis** – Explore dependencies, distributions, and stability effects through interactive charts.
 
-Users define:
+---
 
-* Number of simulation runs (`n_runs`)
-* Ranges of random variables (`x_range`, `y_range`)
-* Mean vector (`μ`)
-* Standard deviations (`σ`)
-* Correlation coefficients (`ρ`)
+## 📉 Risk Measure Computation
 
-### 2. **Covariance & Cholesky Decomposition**
+RiskSim provides three core risk measures, applicable across **Monte Carlo**, **Historical**, and **Variance–Covariance** methods.
 
-From the given parameters:
+### **1. Value-at-Risk (VaR)**
 
-* The **variance–covariance matrix** is constructed.
-* A **Cholesky decomposition** is applied to generate correlated random variables.
+VaR represents the **α-quantile of the portfolio loss distribution**, i.e., the loss that is not exceeded with probability *(1 − α)*.
 
-### 3. **Monte Carlo Simulation**
+**Historical Simulation:**
 
-The Gaussian copula–based simulation proceeds as follows:
+* Portfolio realizations are **sorted ascendingly** into `RM_list`.
+* The quantile index is `alpha * len(RM_list)`, yielding the VaR cutoff.
 
-1. Generate independent uniform pseudo-random numbers.
-2. Transform them to independent standard normal variates.
-3. Introduce correlation using Cholesky decomposition.
-4. Transform correlated normals to correlated uniforms (the copula).
-5. Apply user-defined marginals to obtain final dependent realizations ( X ) and ( Y ).
-6. Compute the **portfolio sum** ( S = X + Y ).
+**Variance–Covariance:**
 
-### 4. **Visualization**
+* Computed analogously, but using analytically parameterized portfolio returns from `var_covar_results`.
 
-RiskSim includes multiple visualization functions:
+**Monte Carlo:**
 
-* **Scatter Plots:**
+* Derived from simulated portfolio distributions produced by the copula-based generator.
 
-  * Dependent bivariate normal realizations
-  * Gaussian copula realizations
-  * Uniformly distributed realizations with copula dependency
+---
 
-* **Histograms & CDFs:**
+### **2. Conditional Value-at-Risk (CVaR)**
 
-  * Portfolio sum distributions
-  * Cumulative distributions illustrating dependency effects
+CVaR is the **mean loss beyond the VaR threshold**.
 
-### 5. **Risk Measure Estimation**
+**Procedure:**
 
-RiskSim integrates with a `RiskMeasure` class that calculates:
+1. Identify all losses up to the α-quantile in `RM_list`.
+2. Store them in `CVaR_list`.
+3. Compute their arithmetic mean to estimate the CVaR.
 
-* **VaR (Value at Risk)**
-* **CVaR (Conditional Value at Risk)**
-* **PSRM (Power Spectral Risk Measure)**
+---
 
-These are evaluated for each simulation run, allowing users to assess **stability** and **sensitivity** across multiple Monte Carlo realizations.
+### **3. Power Spectral Risk Measure (PSRM)**
 
-### 6. **Instability Analysis**
+A nonlinear risk measure introducing subjective probability weighting:
 
-Monte Carlo simulations can exhibit significant result variability when the number of samples is low.
-RiskSim allows you to configure:
+$$ \Phi_b(p) = b \cdot p^{b-1}, \quad p \in [0,1], ; b \in (0,1) $$
 
-* Number of simulation runs
-* Number of samples per run
+**Conceptual Steps:**
 
-to study convergence and instability effects interactively.
+1. Sort portfolio losses into `RM_list`.
+2. Compute **subjective probability weights** `subj_ws_list` as:
+$$w_i = \left(\frac{i}{N}\right)^\gamma - \left(\frac{i-1}{N}\right)^\gamma $$
+3. The **expected return** is the mean of `RM_list`.
+4. The **power-spectral risk** is the matrix product of the transposed `RM_list` and `subj_ws_list`.
+
+Smaller `γ` values emphasize **tail events**, while larger ones distribute weight more evenly.
+
+---
+
+## 📊 Visualization & Analytics
+
+* **Scatter plots**  - Show **joint distributions** and **dependency structures** between two assets or risk factors.
+To construct a scatter plot:
+* **Bivariate Normal & Copula Scatter Plots** – Show correlation and dependency effects.
+* **Portfolio Histograms** – Display loss distributions from each risk estimation method.
+* **Cumulative Distribution Functions (CDFs)** – Compare cumulative risk under different dependency structures.
+* **Monte Carlo Instability Plots** – Examine convergence and variability across multiple simulation runs.
 
 ---
 
@@ -97,14 +150,15 @@ to study convergence and instability effects interactively.
    cd risksim
    ```
 
-2. **Build and run docker container**
+2. **Build and run Docker container**
 
    ```bash
    docker-compose up --build
    ```
 
-3. **Open in your browser:**
-   The app will launch at [http://localhost:8501](http://localhost:8501)
+3. **Access in browser:**
+   [http://localhost:8501](http://localhost:8501)
+
 ---
 
 ## ⚙️ Example Configuration
@@ -128,45 +182,6 @@ sim_samples = 100
 alpha = 0.1
 gamma = 0.5
 ```
-
----
-
-## 🧠 Core Concepts
-
-### **Gaussian Copula**
-
-The **Gaussian Copula** links multiple random variables through a correlation matrix while preserving their marginal distributions.
-It enables realistic modeling of portfolio dependencies even when marginals are non-Gaussian.
-
-### **Cholesky Decomposition**
-
-Used to induce correlation between independent standard normal variables:
-$$Z_{\text{corr}} = Z_{\text{indep}} \cdot L^T$$
-where ( L ) is the lower-triangular matrix from Cholesky decomposition.
-
-### **Risk Measures**
-
-* **Value-at-Risk (VaR):**
-  The loss threshold exceeded with probability α.
-
-* **Conditional Value-at-Risk (CVaR):**
-  The expected loss given that VaR has been exceeded.
-
-* **Power Spectral Risk Measure (PSRM):**
-  A nonlinear risk measure incorporating a power factor γ.
-
----
-
-## 📊 Example Visualizations
-
-* **Dependent Bivariate Normal Realizations**
-* **Gaussian Copula Realizations (Uniform space)**
-* **Uniform Realizations with Copula Dependency**
-* **Portfolio Sum Histogram**
-* **Cumulative Distribution Function (CDF)**
-* **Monte Carlo Instability Across Multiple Runs**
-
-Each visualization helps illustrate both **dependency structures** and **portfolio outcome distributions**.
 
 ---
 
