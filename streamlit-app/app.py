@@ -1,10 +1,12 @@
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.stats import norm
 
 from risksim.copula import CopulaSimulator, CopulaConfig
 from risksim.experiment import RiskExperiment, RiskExperimentConfig
-
+from risksim.utils import StockDataLoader, PortfolioAnalyzer
+from risksim.risk import RiskMeasure
 
 st.set_page_config(page_title="Gaussian Copula Simulator", layout="wide")
 
@@ -13,57 +15,62 @@ st.title("📊 Gaussian Copula Simulation & Portfolio Risk Experiment")
 st.sidebar.header("Simulation Parameters")
 
 # --- Copula configuration inputs ---
-n_runs = st.sidebar.number_input(
+n_runs_cfg = st.sidebar.number_input(
     "Number of Monte Carlo runs",
     min_value=100, max_value=100000,
     value=10000, step=1000)
 
 st.sidebar.subheader("X Range")
-x_min = st.sidebar.number_input(
+x_min_cfg = st.sidebar.number_input(
     "X min", min_value=1, max_value=100, value=10, step=1)
-x_max = st.sidebar.number_input(
+x_max_cfg = st.sidebar.number_input(
     "X max", min_value=1, max_value=100, value=20, step=1)
 
 st.sidebar.subheader("Y Range")
-y_min = st.sidebar.number_input(
+y_min_cfg = st.sidebar.number_input(
     "Y min", min_value=1, max_value=100, value=8, step=1)
-y_max = st.sidebar.number_input(
+y_max_cfg = st.sidebar.number_input(
     "Y max", min_value=1, max_value=100, value=22, step=1)
 
 st.sidebar.subheader("Normal Distribution Parameters")
-mu1 = st.sidebar.number_input(
+mu1_cfg = st.sidebar.number_input(
     "μ₁ (mean of X)", min_value=1, max_value=100, value=2, step=1)
-mu2 = st.sidebar.number_input(
+mu2_cfg = st.sidebar.number_input(
     "μ₂ (mean of Y)", min_value=1, max_value=100, value=3, step=1)
-std1 = st.sidebar.number_input(
+std1_cfg = st.sidebar.number_input(
     "σ₁ (std of X)", min_value=1, max_value=100, value=2, step=1)
-std2 = st.sidebar.number_input(
+std2_cfg = st.sidebar.number_input(
     "σ₂ (std of Y)", min_value=1, max_value=100, value=3, step=1)
-corr = st.sidebar.slider(
+corr_cfg = st.sidebar.slider(
     "Correlation ρ",
     min_value=-0.99, max_value=0.99,
     value=0.0, step=0.05)
 
 copula_cfg = CopulaConfig(
-    n_runs=n_runs,
-    x_range=(x_min, x_max),
-    y_range=(y_min, y_max),
-    mu=[mu1, mu2],
-    std=[std1, std2],
-    corr=[corr])
+    n_runs=n_runs_cfg,
+    x_range=(x_min_cfg, x_max_cfg),
+    y_range=(y_min_cfg, y_max_cfg),
+    mu=[mu1_cfg, mu2_cfg],
+    std=[std1_cfg, std2_cfg],
+    corr=[corr_cfg])
 
 st.sidebar.header("Risk Experiment Parameters")
-runs = st.sidebar.number_input(
+runs_cfg = st.sidebar.number_input(
     "Number of experiments", min_value=1, max_value=200, value=10)
-sim_samples = st.sidebar.number_input(
+sim_samples_cfg = st.sidebar.number_input(
     "Samples per experiment", min_value=50, max_value=5000, value=100)
-alpha = st.sidebar.number_input(
+alpha_cfg = st.sidebar.number_input(
     "Alpha (Quantile / VaR)", min_value=0.05, max_value=0.5, value=0.05)
-gamma = st.sidebar.number_input(
+gamma_cfg = st.sidebar.number_input(
     "Gamma (for Power Spectral Risk Measure)", min_value=0.1, max_value=1.0, value=0.5)
 
+st.sidebar.header("Historical Data Settings")
+ticker1 = st.sidebar.text_input("Ticker 1", value="VOW3.DE")
+ticker2 = st.sidebar.text_input("Ticker 2", value="FME.DE")
+data_dir = st.sidebar.text_input("Data Directory", value="../datasets")
+
 exp_cfg = RiskExperimentConfig(
-    runs=runs, sim_samples=sim_samples, alpha=alpha, gamma=gamma)
+    runs=runs_cfg, sim_samples=sim_samples_cfg, alpha=alpha_cfg, gamma=gamma_cfg)
 
 st.markdown("---")
 
@@ -157,3 +164,102 @@ if st.button("Run Experiment"):
     ax.grid(True, linestyle="--", alpha=0.7)
     ax.legend()
     st.pyplot(fig)
+
+# --- Historical Portfolio Analysis ---
+st.markdown("---")
+st.subheader("🔹 Historical Portfolio Analysis (Real Data)")
+
+if st.button("Run Historical Analysis"):
+
+    tickers = [ticker1, ticker2]
+
+    # Step 1: Load data
+    loader = StockDataLoader(tickers=tickers, data_dir=data_dir)
+    data = loader.load_data()
+
+    # Step 2: Compute returns & portfolio stats
+    analyzer = PortfolioAnalyzer(data)
+    v1 = analyzer.get_returns(tickers[0])
+    v2 = analyzer.get_returns(tickers[1])
+    corr_cfg = analyzer.calculate_correlation(tickers[0], tickers[1])
+    mu1_cfg, std1_cfg = analyzer.calculate_statistics(v1)
+    mu2_cfg, std2_cfg = analyzer.calculate_statistics(v2)
+
+    v_pf = analyzer.get_portfolio_returns() # Historical (empirical) returns
+    mu_pf, std_pf = analyzer.calculate_statistics(v_pf)
+
+    # These are your key series:
+    n_samples = len(v_pf)
+    var_covar_results = np.random.normal(mu_pf, std_pf, size=n_samples)
+
+    # Step 3: Display results
+    st.write("### Summary Statistics")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.metric(label=f"{tickers[0]} Mean Return", value=f"{mu1_cfg:.4f}")
+        st.metric(label=f"{tickers[0]} Std Dev", value=f"{std1_cfg:.4f}")
+    with col2:
+        st.metric(label=f"{tickers[1]} Mean Return", value=f"{mu2_cfg:.4f}")
+        st.metric(label=f"{tickers[1]} Std Dev", value=f"{std2_cfg:.4f}")
+
+    st.info(f"Correlation between {tickers[0]} and {tickers[1]}: **{corr_cfg:.4f}**")
+
+    st.write("### Portfolio Performance")
+    st.metric(label="Portfolio Mean Return", value=f"{mu_pf:.4f}")
+    st.metric(label="Portfolio Std Dev", value=f"{std_pf:.4f}")
+
+    # Historical (empirical)
+    rm_hist = RiskMeasure(
+        v_pf,
+        alpha=alpha_cfg,
+        gamma=gamma_cfg)
+    VaR_hist = rm_hist.VaR()
+    CVaR_hist = rm_hist.CVaR()
+    PSRM_hist = rm_hist.power()
+
+    # Parametric (Variance-Covariance)
+    rm_param = RiskMeasure(
+        var_covar_results,
+        alpha=alpha_cfg,
+        gamma=gamma_cfg)
+    VaR_param = rm_param.VaR()
+    CVaR_param = rm_param.CVaR()
+    PSRM_param = rm_param.power()
+
+    st.write("### Risk Measure Comparison")
+    st.dataframe({
+        "Method": ["Historical", "Variance-Covariance"],
+        "VaR": [VaR_hist, VaR_param],
+        "CVaR": [CVaR_hist, CVaR_param],
+        "PowerSpectral": [PSRM_hist, PSRM_param]})
+
+    # Step 4: Visualizations
+    st.write("### Scatter: Asset Returns Correlation")
+    fig1, ax1 = plt.subplots(figsize=(6, 4))
+    ax1.scatter(v1, v2, alpha=0.6)
+    ax1.set_xlabel(f"Return {tickers[0]}")
+    ax1.set_ylabel(f"Return {tickers[1]}")
+    ax1.set_title("Joint Distribution of Asset Returns")
+    ax1.grid(True, linestyle="--", alpha=0.6)
+    st.pyplot(fig1)
+
+    st.write("### Portfolio Return Distribution")
+    fig2, ax2 = plt.subplots(figsize=(6, 4))
+    hist, bin_edges = np.histogram(v_pf, bins=50, density=True)
+    dx = bin_edges[1] - bin_edges[0]
+    F_hist = np.cumsum(hist) * dx
+    ax2.plot(bin_edges[1:], F_hist, label="Historical Simulation")
+
+    x_range = np.linspace(v_pf.min(), v_pf.max(), 50)
+    ax2.plot(
+        x_range,
+        norm.cdf(x_range, mu_pf, std_pf),
+        label="Variance-Covariance Method")
+
+    ax2.set_xlabel("Return")
+    ax2.set_ylabel("Cumulative Probability")
+    ax2.set_title("Historical vs Parametric CDF")
+    ax2.legend()
+    ax2.grid(True, linestyle="--", alpha=0.6)
+    st.pyplot(fig2)
