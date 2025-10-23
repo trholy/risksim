@@ -21,7 +21,7 @@ The framework enables users to model **portfolio dependencies**, compute **risk 
 
 * 💻 **Interactive Dashboard** – Explore dependencies, distributions, and risk measure variability directly in your browser using Streamlit.
 
-* 🔁 **Instability & Convergence Analysis** – Evaluate the variability of Monte Carlo results under repeated sampling.
+* 🔁 **Output Variability Demonstration** – Check out the variability of Monte Carlo results under repeated sampling.
 
 ---
 
@@ -137,8 +137,7 @@ To construct a scatter plot:
 * **Bivariate Normal & Copula Scatter Plots** – Show correlation and dependency effects.
 * **Portfolio Histograms** – Display loss distributions from each risk estimation method.
 * **Cumulative Distribution Functions (CDFs)** – Compare cumulative risk under different dependency structures.
-* **Monte Carlo Instability Plots** – Examine convergence and variability across multiple simulation runs.
-
+* **Monte Carlo Variability Plots** – Check out the variability across multiple simulation runs.
 ---
 
 ## ▶️ Run the Streamlit Application
