@@ -3,12 +3,11 @@ from __future__ import annotations
 import logging
 from collections.abc import Mapping, MutableMapping, Sequence
 from dataclasses import dataclass
-from typing import Optional, Tuple
 
 import numpy as np
 from scipy.stats import norm
 
-from risksim.utils import cholesky_decomp, var_covar_matrix
+from risksim.utils import _cholesky_decomp, _var_covar_matrix
 
 logger = logging.getLogger(__name__)
 
@@ -57,8 +56,8 @@ class CopulaSimulator:
             raise ValueError("mu and std must be sequences of length 2")
 
         # prepare covariance and decomposition
-        self._cov = var_covar_matrix(self.std, config.corr)
-        self._chol = cholesky_decomp(self._cov)
+        self._cov = _var_covar_matrix(self.std, config.corr)
+        self._chol = _cholesky_decomp(self._cov)
 
     def run(
             self,
