@@ -2,9 +2,11 @@ from collections.abc import Iterable
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+from scipy import stats
 
 
-class PlotUtils:
+class MonteCarloPlotUtils:
     """Small collection of plotting helper functions used by the example script.
 
     These are intentionally simple wrappers around matplotlib to keep the
@@ -86,4 +88,55 @@ class PlotUtils:
         plt.ylabel("U₂ (copula realisation)")
         plt.grid(True, linestyle="--", alpha=0.7)
         plt.tight_layout()
+        plt.show()
+
+
+class PortfolioPlotter:
+    """Handles all plotting functionality for portfolio analysis."""
+
+    @staticmethod
+    def scatter_returns(
+            series_x: pd.Series,
+            series_y: pd.Series,
+            label_x: str,
+            label_y: str
+    ):
+        """Plot joint distribution of two return series aligned by date index."""
+        aligned = pd.concat([series_x, series_y], axis=1, join="inner").dropna()
+        aligned.columns = [label_x, label_y]
+
+        if aligned.empty:
+            raise ValueError("No overlapping data to plot.")
+
+        plt.scatter(aligned[label_x], aligned[label_y], alpha=0.7)
+        plt.xlabel(f"Return {label_x}")
+        plt.ylabel(f"Return {label_y}")
+        plt.title(f"Joint Distribution: {label_x} vs {label_y}")
+        PortfolioPlotter._add_grid()
+
+    @staticmethod
+    def compare_distributions(values_pf, mu_pf, std_pf, bins=50):
+        """Plot empirical (historical) vs parametric (normal) CDFs."""
+        hist, bin_edges = np.histogram(values_pf, bins=bins, density=True)
+        dx = bin_edges[1] - bin_edges[0]
+        F_hist = np.cumsum(hist) * dx
+        plt.plot(bin_edges[1:], F_hist, label="Historical Simulation")
+
+        x_range = np.linspace(values_pf.min(), values_pf.max(), bins)
+        plt.plot(
+            x_range,
+            stats.norm.cdf(x_range, mu_pf, std_pf),
+            label="Variance-Covariance Method")
+
+        plt.xlabel("Return")
+        plt.ylabel("Cumulative Probability")
+        plt.title("Portfolio Return Distribution Comparison")
+        plt.legend()
+        PortfolioPlotter._add_grid()
+
+    @staticmethod
+    def _add_grid():
+        plt.grid(True)
+        plt.axhline(0, color="black")
+        plt.axvline(0, color="black")
         plt.show()
