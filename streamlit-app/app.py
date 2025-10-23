@@ -67,7 +67,7 @@ gamma_cfg = st.sidebar.number_input(
 st.sidebar.header("Historical Data Settings")
 ticker1 = st.sidebar.text_input("Ticker 1", value="VOW3.DE")
 ticker2 = st.sidebar.text_input("Ticker 2", value="FME.DE")
-data_dir = st.sidebar.text_input("Data Directory", value="../datasets")
+data_dir = st.sidebar.text_input("Data Directory", value="datasets")
 
 exp_cfg = RiskExperimentConfig(
     runs=runs_cfg, sim_samples=sim_samples_cfg, alpha=alpha_cfg, gamma=gamma_cfg)

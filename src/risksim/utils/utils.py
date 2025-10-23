@@ -46,7 +46,7 @@ class StockDataLoader:
     """Loads and prepares stock price data from CSV files."""
 
     tickers: list[str]
-    data_dir: str | Path = field(default=Path("../datasets"))
+    data_dir: str | Path = field(default=Path("datasets"))
 
     def __post_init__(self):
         """Ensure path is a Path object and exists."""
