@@ -1,10 +1,9 @@
 from collections.abc import Sequence
+from dataclasses import dataclass, field
+from pathlib import Path
 
 import numpy as np
-
 import pandas as pd
-from pathlib import Path
-from dataclasses import dataclass, field
 
 
 def _var_covar_matrix(

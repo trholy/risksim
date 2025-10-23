@@ -1,13 +1,13 @@
 from .utils import (
+    PortfolioAnalyzer,
+    StockDataLoader,
     _cholesky_decomp,
     _var_covar_matrix,
-    StockDataLoader,
-    PortfolioAnalyzer
 )
 
 __all__ = [
-    '_cholesky_decomp',
-    '_var_covar_matrix',
+    'PortfolioAnalyzer',
     'StockDataLoader',
-    'PortfolioAnalyzer'
+    '_cholesky_decomp',
+    '_var_covar_matrix'
 ]
