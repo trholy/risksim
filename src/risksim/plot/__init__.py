@@ -1,3 +1,6 @@
-from .plotting import PlotUtils
+from .plotting import MonteCarloPlotUtils, PortfolioPlotter
 
-__all__ = ['PlotUtils']
+__all__ = [
+    'MonteCarloPlotUtils',
+    'PortfolioPlotter',
+]

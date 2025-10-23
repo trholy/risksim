@@ -1,6 +1,13 @@
-from .utils import cholesky_decomp, var_covar_matrix
+from .utils import (
+    _cholesky_decomp,
+    _var_covar_matrix,
+    StockDataLoader,
+    PortfolioAnalyzer
+)
 
 __all__ = [
-    'cholesky_decomp',
-    'var_covar_matrix'
+    '_cholesky_decomp',
+    '_var_covar_matrix',
+    'StockDataLoader',
+    'PortfolioAnalyzer'
 ]
