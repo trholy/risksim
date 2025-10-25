@@ -13,13 +13,13 @@ The framework enables users to model **portfolio dependencies**, compute **risk 
 
 * 🧠 **Three Integrated Risk Methods**
 
-  * **Monte Carlo Simulation (Gaussian Copula)** – Generate correlated synthetic returns using the Gaussian copula framework.
+  * **Monte Carlo Simulation (Gaussian Copula)** – Generate correlated synthetic returns using the Gaussian copula.
   * **Historical Simulation** – Estimate risk directly from empirical portfolio return data.
   * **Variance–Covariance Method** – Compute risk measures under the normality assumption using μ–σ parameterization.
 
 * 📊 **Risk Measure Computation** – Compute **VaR**, **CVaR**, and **PSRM** across all methods.
 
-* 💻 **Interactive Dashboard** – Explore dependencies, distributions, and risk measure variability directly in your browser using Streamlit.
+* 💻 **Interactive Dashboard** – Explore dependencies, distributions, and risk measure variability directly in your browser.
 
 * 🔁 **Output Variability Demonstration** – Check out the variability of Monte Carlo results under repeated sampling.
 
@@ -31,7 +31,7 @@ RiskSim provides three approaches to estimate portfolio risk.
 
 ### 1. **Monte Carlo Simulation (Gaussian Copula)**
 
-The Monte Carlo engine generates **pseudo-random correlated realizations** of portfolio components using a **Gaussian copula**.
+The Monte Carlo method generates **pseudo-random correlated realizations** of portfolio components using a **Gaussian copula**.
 It allows flexible specification of marginal distributions and dependency structures via Cholesky decomposition of the covariance matrix.
 
 **Process Overview:**
@@ -130,16 +130,6 @@ Smaller `γ` values emphasize **tail events**, while larger ones distribute weig
 
 ---
 
-## 📊 Visualization & Analytics
-
-* **Scatter plots**  - Show **joint distributions** and **dependency structures** between two assets or risk factors.
-To construct a scatter plot:
-* **Bivariate Normal & Copula Scatter Plots** – Show correlation and dependency effects.
-* **Portfolio Histograms** – Display loss distributions from each risk estimation method.
-* **Cumulative Distribution Functions (CDFs)** – Compare cumulative risk under different dependency structures.
-* **Monte Carlo Variability Plots** – Check out the variability across multiple simulation runs.
----
-
 ## ▶️ Run the Streamlit Application
 
 1. **Clone the repository**
@@ -157,30 +147,6 @@ To construct a scatter plot:
 
 3. **Access in browser:**
    [http://localhost:8501](http://localhost:8501)
-
----
-
-## ⚙️ Example Configuration
-
-**Simulation parameters (UI configurable):**
-
-```python
-n_runs = 10000
-x_range = (10.0, 20.0)
-y_range = (8.0, 22.0)
-mu = [2.0, 3.0]
-std = [2.0, 3.0]
-corr = [0.0]
-```
-
-**Experiment parameters (UI configurable):**
-
-```python
-runs = 10
-sim_samples = 100
-alpha = 0.1
-gamma = 0.5
-```
 
 ---
 
